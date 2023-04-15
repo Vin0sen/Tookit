@@ -1,0 +1,6 @@
+admin
+admin.php
+login.aspx
+admin/Login.asp
+admin/login.aspx
+robots.txt
