@@ -1,0 +1,12 @@
+robots.txt
+# 后台字典
+admin
+admin.php
+admin/home
+admin/Login.asp
+admin/login.aspx
+login.aspx
+backend
+administrator
+sys/login
+api/sys/login
