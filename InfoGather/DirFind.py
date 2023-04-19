@@ -3,8 +3,7 @@ Filename: DirFind.py
 Author: Vin0sen
 Contact: 464029561@qq.com
 """
-import sys
-import os
+import sys, os, time
 import threading
 import argparse
 import random
@@ -16,8 +15,14 @@ class DirFind():
         目录扫描
     """
     def __init__(self) -> None:
-        self.wordlist = os.path.dirname(__file__) + '/db/dict.txt'
-        self.user_agent = os.path.dirname(__file__) + '/db/ua.txt'
+        self.position = os.path.dirname(__file__)
+        self.wordlist = self.position + '/db/dict.txt'
+        self.user_agent = self.position + '/db/ua.txt'
+        self.out_file = self.position + '/db/output_'+ \
+            time.strftime('%Y-%m-%d',time.localtime(time.time())) + \
+            '.txt'
+        # self.urlsfile = self.position + '/db/urls.txt'
+        
         self.param_parse()
 
     def param_parse(self):
@@ -27,17 +32,19 @@ class DirFind():
                                          sys.argv[0] + " -u https://www.baidu.com/")
         # append params
         parser.add_argument("-u", "--url")
+        parser.add_argument("-f", "--file")  # , default=self.urlsfile
         parser.add_argument("-t", "--threads", type=int, default=2)
+        parser.add_argument("-o", "--output", default=self.out_file)
         # parse params
         self.args = parser.parse_args()
 
     def run(self):
         """启动函数"""
-
-        wordlist = numpy.loadtxt(self.wordlist, encoding='utf-8', dtype="str")
+        if self.args.url == None and self.args.file == None:
+            print("-u URL or -f FILE is required")
+            sys.exit()
         
-        # with open(self.wordlist, 'r', encoding="utf-8") as file:
-        #     wordlist = file.readlines()
+        wordlist = numpy.loadtxt(self.wordlist, encoding='utf-8', dtype="str")
         self.assign_thread(wordlist, len(wordlist), self.args.threads)
 
     def assign_thread(self, wordlist, length, sum_threads):
@@ -52,20 +59,33 @@ class DirFind():
             list_for_thread = wordlist[start:end]
 
             # 创建和启动线程
-            thread = threading.Thread(target=self.request, args=(list_for_thread,))
+            thread = threading.Thread(target=self.process, args=(list_for_thread,))
             thread.start()
 
         # 处理最后一组网址
         list_for_thread = wordlist[sum_threads * num_per_thread:]
-        thread = threading.Thread(target=self.request, args=(list_for_thread,))
+        thread = threading.Thread(target=self.process, args=(list_for_thread,))
         thread.start()
 
-    def request(self, process_list):
+    def process(self, process_list):
         """
         发起请求, 处理响应结果
         """
-        for i in process_list:
-            url = f"{self.args.url}" + i.strip()
+        # 若指定 -u , 
+        if self.args.url:
+            self.sendrequest(self.args.url, process_list)
+        # 未指定 -u , 采用 -f , 批量进行请求, 默认读取 db/urls.txt
+        else:
+            with open(self.args.file, 'r', encoding="utf-8") as file:
+                url = file.readline().strip()
+                while url:
+                    self.sendrequest(url, process_list)
+                    url = file.readline()
+        
+    def sendrequest(self, host, process_list):
+        for uri in process_list:
+            url = f"{host}" + uri.strip()
+
             headers = {
                 'User-Agent': self.random_agent(),
                 'Referer': 'https://www.bing.com/',

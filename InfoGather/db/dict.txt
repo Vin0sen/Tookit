@@ -3,10 +3,12 @@ robots.txt
 admin
 admin.php
 admin/home
-admin/Login.asp
+admin/login
 admin/login.aspx
+manage/login.aspx
 login.aspx
 backend
 administrator
 sys/login
+system/login.jsp
 api/sys/login
