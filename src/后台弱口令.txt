@@ -3,3 +3,4 @@ admin/admin
 admin1/123456
 admin/admin123
 manager/123456
+manage/123456

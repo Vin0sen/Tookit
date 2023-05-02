@@ -12,3 +12,4 @@ administrator
 sys/login
 system/login.jsp
 api/sys/login
+user/login

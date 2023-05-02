@@ -1,0 +1,24 @@
+import re
+
+def reExtract(file:str, output):
+    """通过正则匹配的方式从文件提取内容, 然后按行打印出来
+    用途: xls, pdf文件中复制学号, 姓名等信息, 提取生成字典
+    """
+    with open(file, 'r', encoding='utf-8') as f, \
+        open(output,'w', encoding='utf-8') as outfile:
+        # 读取文件内容
+        content = f.read()
+
+        # 使用正则表达式匹配
+        pattern = re.compile('[a-z]{3,}')
+        matches = pattern.findall(content)
+
+        # 将匹配项每行输出一个
+        for match in matches:
+            outfile.write(f"{match}\n")
+
+
+if __name__ == '__main__':
+    infile = ""
+    outfile = ""
+    reExtract(infile, outfile)
